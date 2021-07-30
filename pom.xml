@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>io.thundra</groupId>
+    <artifactId>thundra-demo-localstack</artifactId>
+    <name>thundra-demo-localstack</name>
+    <version>2.0.0</version>
+    <packaging>jar</packaging>
+    
+    <properties>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+        <java.version>1.8</java.version>
+
+        <maven.shade.plugin.version>2.3</maven.shade.plugin.version>
+
+        <thundra.agent.version>2.7.12</thundra.agent.version>
+
+        <aws.sdk.version>1.11.330</aws.sdk.version>
+        <aws.lambda.core.version>1.2.0</aws.lambda.core.version>
+        <aws.lambda.events.version>2.2.7</aws.lambda.events.version>
+        <jedis.version>2.9.0</jedis.version>
+        <httplclient.vesion>4.5.6</httplclient.vesion>
+        <httpcore.vesion>4.4.10</httpcore.vesion>
+        <json.version>20160810</json.version>
+        <log4j.version>1.2.17</log4j.version>
+    </properties>
+
+    <dependencies>
+
+        <!-- Thundra dependencies                       -->
+        <!-- ========================================== -->
+        <dependency>
+            <groupId>io.thundra.agent</groupId>
+            <artifactId>thundra-agent-lambda-all</artifactId>
+            <type>pom</type>
+            <version>${thundra.agent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.thundra.agent</groupId>
+            <artifactId>thundra-agent-trace-instrument-metadatagen</artifactId>
+            <version>${thundra.agent.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <!-- ========================================== -->
+
+        <!-- AWS dependencies                           -->
+        <!-- ========================================== -->
+        <dependency>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-java-sdk-lambda</artifactId>
+            <version>${aws.sdk.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-java-sdk-sqs</artifactId>
+            <version>${aws.sdk.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-java-sdk-sns</artifactId>
+            <version>${aws.sdk.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-java-sdk-dynamodb</artifactId>
+            <version>${aws.sdk.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-java-sdk-kinesis</artifactId>
+            <version>${aws.sdk.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-java-sdk-s3</artifactId>
+            <version>${aws.sdk.version}</version>
+        </dependency>
+        <!-- ========================================== -->
+
+        <!-- Other dependencies                         -->
+        <!-- ========================================== -->
+        <dependency>
+            <groupId>redis.clients</groupId>
+            <artifactId>jedis</artifactId>
+            <version>${jedis.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>${httplclient.vesion}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpcore</artifactId>
+            <version>${httpcore.vesion}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>${json.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>${log4j.version}</version>
+        </dependency>
+        <!-- ========================================== -->
+
+    </dependencies>
+
+    <build>
+        <finalName>${project.artifactId}</finalName>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>${maven.shade.plugin.version}</version>
+                <configuration>
+                    <createDependencyReducedPom>false</createDependencyReducedPom>
+                    <transformers>
+                        <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+                    </transformers>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+    <repositories>
+        <repository>
+            <id>thundra-releases</id>
+            <name>Thundra Releases</name>
+            <url>https://repo.thundra.io/content/repositories/thundra-releases</url>
+        </repository>
+        <repository>
+            <id>thundra-snapshots</id>
+            <name>Thundra Snapshots</name>
+            <url>https://repo.thundra.io/content/repositories/thundra-snapshots</url>
+        </repository>
+    </repositories>
+
+</project>
