@@ -1,5 +1,5 @@
 export DOCKER_BRIDGE ?= $(shell (uname -a | grep Linux > /dev/null) && echo 172.17.0.1 || echo docker.for.mac.localhost)
-export SERVICES = serverless,cloudformation,sts,sqs,dynamodb,s3
+export SERVICES = serverless,cloudformation,sts,sqs,dynamodb,s3,stepfunctions
 export AWS_ACCESS_KEY_ID ?= test
 export AWS_SECRET_ACCESS_KEY ?= test
 export AWS_DEFAULT_REGION ?= us-east-1

@@ -9,7 +9,7 @@
     <name>thundra-demo-localstack</name>
     <version>2.0.0</version>
     <packaging>jar</packaging>
-    
+
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
@@ -36,18 +36,18 @@
 
         <!-- Thundra dependencies                       -->
         <!-- ========================================== -->
-        <dependency>
-            <groupId>io.thundra.agent</groupId>
-            <artifactId>thundra-agent-lambda-all</artifactId>
-            <type>pom</type>
-            <version>${thundra.agent.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.thundra.agent</groupId>
-            <artifactId>thundra-agent-trace-instrument-metadatagen</artifactId>
-            <version>${thundra.agent.version}</version>
-            <scope>provided</scope>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>io.thundra.agent</groupId>-->
+<!--            <artifactId>thundra-agent-lambda-all</artifactId>-->
+<!--            <type>pom</type>-->
+<!--            <version>${thundra.agent.version}</version>-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>io.thundra.agent</groupId>-->
+<!--            <artifactId>thundra-agent-trace-instrument-metadatagen</artifactId>-->
+<!--            <version>${thundra.agent.version}</version>-->
+<!--            <scope>provided</scope>-->
+<!--        </dependency>-->
         <!-- ========================================== -->
 
         <!-- AWS dependencies                           -->
@@ -82,6 +82,11 @@
             <artifactId>aws-java-sdk-s3</artifactId>
             <version>${aws.sdk.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-java-sdk-stepfunctions</artifactId>
+            <version>${aws.sdk.version}</version>
+        </dependency>
         <!-- ========================================== -->
 
         <!-- Other dependencies                         -->
@@ -111,6 +116,37 @@
             <artifactId>log4j</artifactId>
             <version>${log4j.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-lambda-java-core</artifactId>
+            <version>1.2.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-lambda-java-events</artifactId>
+            <version>3.9.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-lambda-java-log4j</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <version>2.9.8</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.9.10.3</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+            <version>2.9.8</version>
+        </dependency>
+
         <!-- ========================================== -->
 
     </dependencies>
