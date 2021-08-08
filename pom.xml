@@ -20,7 +20,7 @@
 
         <maven.shade.plugin.version>2.3</maven.shade.plugin.version>
 
-        <thundra.agent.version>2.7.12</thundra.agent.version>
+        <thundra.agent.version>2.7.14-SNAPSHOT</thundra.agent.version>
 
         <aws.sdk.version>1.11.330</aws.sdk.version>
         <aws.lambda.core.version>1.2.0</aws.lambda.core.version>
@@ -36,18 +36,18 @@
 
         <!-- Thundra dependencies                       -->
         <!-- ========================================== -->
-<!--        <dependency>-->
-<!--            <groupId>io.thundra.agent</groupId>-->
-<!--            <artifactId>thundra-agent-lambda-all</artifactId>-->
-<!--            <type>pom</type>-->
-<!--            <version>${thundra.agent.version}</version>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>io.thundra.agent</groupId>-->
-<!--            <artifactId>thundra-agent-trace-instrument-metadatagen</artifactId>-->
-<!--            <version>${thundra.agent.version}</version>-->
-<!--            <scope>provided</scope>-->
-<!--        </dependency>-->
+        <dependency>
+            <groupId>io.thundra.agent</groupId>
+            <artifactId>thundra-agent-lambda-all</artifactId>
+            <type>pom</type>
+            <version>${thundra.agent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.thundra.agent</groupId>
+            <artifactId>thundra-agent-trace-instrument-metadatagen</artifactId>
+            <version>${thundra.agent.version}</version>
+            <scope>provided</scope>
+        </dependency>
         <!-- ========================================== -->
 
         <!-- AWS dependencies                           -->
@@ -115,36 +115,6 @@
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
             <version>${log4j.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.amazonaws</groupId>
-            <artifactId>aws-lambda-java-core</artifactId>
-            <version>1.2.0</version>
-        </dependency>
-        <dependency>
-            <groupId>com.amazonaws</groupId>
-            <artifactId>aws-lambda-java-events</artifactId>
-            <version>3.9.0</version>
-        </dependency>
-        <dependency>
-            <groupId>com.amazonaws</groupId>
-            <artifactId>aws-lambda-java-log4j</artifactId>
-            <version>1.0.0</version>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-core</artifactId>
-            <version>2.9.8</version>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <version>2.9.10.3</version>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-annotations</artifactId>
-            <version>2.9.8</version>
         </dependency>
 
         <!-- ========================================== -->

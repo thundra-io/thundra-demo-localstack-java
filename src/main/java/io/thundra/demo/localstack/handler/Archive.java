@@ -1,7 +1,7 @@
 package io.thundra.demo.localstack.handler;
 
 import com.amazonaws.services.lambda.runtime.Context;
-import com.amazonaws.services.lambda.runtime.RequestHandler;
+import io.thundra.agent.lambda.core.handler.request.LambdaRequestHandler;
 import io.thundra.demo.localstack.service.AppRequestService;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -10,12 +10,12 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-public class Archive implements RequestHandler<Map<String, String>, Map<String, String>> {
+public class Archive implements LambdaRequestHandler<Map<String, String>, Map<String, String>> {
     private static final Logger logger = LogManager.getLogger(Archive.class);
     private AppRequestService appRequestService = new AppRequestService();
 
     @Override
-    public Map<String,String> handleRequest(Map<String,String> request, Context context) {
+    public Map<String,String> doHandleRequest(Map<String,String> request, Context context) {
         try {
             logger.info("Archive Handle Request -->" + request);
             String requestId = appRequestService.getRequestId(request);

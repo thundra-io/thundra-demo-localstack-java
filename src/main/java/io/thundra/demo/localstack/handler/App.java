@@ -1,11 +1,11 @@
 package io.thundra.demo.localstack.handler;
 
 import com.amazonaws.services.lambda.runtime.Context;
-import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.thundra.agent.lambda.core.handler.request.LambdaRequestHandler;
 import io.thundra.demo.localstack.model.AppRequests;
 import io.thundra.demo.localstack.model.Response;
 import io.thundra.demo.localstack.service.AppRequestService;
@@ -19,7 +19,7 @@ import java.util.Map;
 /**
  * @author tol
  */
-public class App implements RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
+public class App implements LambdaRequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
 
     private static final Logger logger = LogManager.getLogger(App.class);
     private final ObjectMapper mapper = new ObjectMapper();
@@ -29,7 +29,7 @@ public class App implements RequestHandler<APIGatewayProxyRequestEvent, APIGatew
 
 
     @Override
-    public APIGatewayProxyResponseEvent handleRequest(APIGatewayProxyRequestEvent request, Context context) {
+    public APIGatewayProxyResponseEvent doHandleRequest(APIGatewayProxyRequestEvent request, Context context) {
         try {
             logger.info("Request --> " + request);
             if ("/requests".equals(request.getPath()) && "POST".equals(request.getHttpMethod())) {
