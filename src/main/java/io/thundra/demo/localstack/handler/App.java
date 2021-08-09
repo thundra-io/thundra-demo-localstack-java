@@ -12,7 +12,7 @@ import io.thundra.demo.localstack.service.AppRequestService;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -23,10 +23,10 @@ public class App implements LambdaRequestHandler<APIGatewayProxyRequestEvent, AP
 
     private static final Logger logger = LogManager.getLogger(App.class);
     private final ObjectMapper mapper = new ObjectMapper();
-    private static final Map<String, String> HEADERS = Collections.singletonMap("content-type", "application/json");
-
+    private static final Map<String, String> HEADERS = new HashMap<String, String>() {{
+        put("content-type", "application/json");
+    }};
     private AppRequestService appRequestService = new AppRequestService();
-
 
     @Override
     public APIGatewayProxyResponseEvent doHandleRequest(APIGatewayProxyRequestEvent request, Context context) {
@@ -34,7 +34,6 @@ public class App implements LambdaRequestHandler<APIGatewayProxyRequestEvent, AP
             logger.info("Request --> " + request);
             if ("/requests".equals(request.getPath()) && "POST".equals(request.getHttpMethod())) {
                 return startNewRequest();
-
             } else if ("/requests".equals(request.getPath()) && "GET".equals(request.getHttpMethod())) {
                 return listRequests();
             } else {
