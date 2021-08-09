@@ -26,7 +26,7 @@ provider:
   deploymentBucket:
     name: thundra-demo-localstack-bucket
   environment:
-    thundra_apikey: <YOUR-THUNDRA-API-KEY-HERE>
+    thundra_apikey: 7d13fbdc-f91d-4371-b974-afca1c9e2fb1
 
 functions:
   http_handleRequest:
@@ -39,19 +39,18 @@ functions:
       - http:
           path: /requests
           method: get
-  sqs_handleItem:
-    handler: io.thundra.demo.localstack.handler.Worker
+  backend_processRequest:
+    handler: io.thundra.demo.localstack.handler.Processing
     runtime: java8
     events:
       - sqs:
           arn:
-            Fn::GetAtt: [requestQueue, Arn]
-  backend_processRequest:
-    handler: io.thundra.demo.localstack.handler.Processing
-    runtime: java8
+            Fn::GetAtt: [ requestQueue, Arn ]
   backend_archiveResult:
     handler: io.thundra.demo.localstack.handler.Archive
     runtime: java8
+    events:
+      - sns: requestTopic
 
 resources:
   Resources:
@@ -77,24 +76,3 @@ resources:
       Type: AWS::SQS::Queue
       Properties:
         QueueName: requestQueue
-    processingStateMachine:
-      Type: AWS::StepFunctions::StateMachine
-      Properties:
-        StateMachineName: processingStateMachine
-        RoleArn: testrole
-        DefinitionString: |
-          {
-            "StartAt": "ProcessRequest",
-            "States": {
-              "ProcessRequest": {
-                "Type": "Task",
-                "Resource": "arn:aws:lambda:${self:provider.region}:${self:custom.accountID}:function:${self:service}-${self:provider.stage}-backend_processRequest",
-                "Next": "ArchiveResult"
-              },
-              "ArchiveResult": {
-                "Type": "Task",
-                "Resource": "arn:aws:lambda:${self:provider.region}:${self:custom.accountID}:function:${self:service}-${self:provider.stage}-backend_archiveResult",
-                "End": true
-              }
-            }
-          }
