@@ -11,8 +11,8 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -22,8 +22,8 @@ public abstract class LocalstackTest {
     protected static final int ASSERT_EVENTUALLY_TIMEOUT_SECS = 30;
     protected static String lambdaUrl;
 
-    @BeforeAll
-    static void setup() throws IOException, InterruptedException {
+    @BeforeEach
+    void setup() throws IOException, InterruptedException {
         executeCommand("make start");
         String result = executeCommand("awslocal apigateway get-rest-apis");
         JSONObject object = new JSONObject(result);
@@ -32,8 +32,8 @@ public abstract class LocalstackTest {
         lambdaUrl = "http://localhost:4566/restapis/" + restApiId + "/local/_user_request_/requests";
     }
 
-    @AfterAll
-    static void teardown() throws IOException, InterruptedException {
+    @AfterEach
+    void teardown() throws IOException, InterruptedException {
         executeCommand("docker stop $(docker ps -a -q --filter ancestor=localstack/localstack --format=\"{{.ID}}\")");
     }
 
