@@ -15,7 +15,7 @@ install:         ## Install dependencies
 
 build:          ## Build app
 	echo "Building Serverless app ..."
-	mvn clean package
+	mvn clean package -DskipTests
 
 test:           ## Test app
 	echo "Building Serverless app ..."

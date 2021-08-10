@@ -4,6 +4,9 @@ public class Response {
     private String requestID;
     private String status;
 
+    public Response() {
+    }
+
     public Response(String requestID, String status) {
         this.requestID = requestID;
         this.status = status;
