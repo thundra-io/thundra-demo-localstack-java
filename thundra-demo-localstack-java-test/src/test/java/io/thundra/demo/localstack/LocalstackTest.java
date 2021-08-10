@@ -24,7 +24,7 @@ public abstract class LocalstackTest {
 
     @BeforeAll
     static void setup() throws IOException, InterruptedException {
-        executeCommand("make start");
+        //executeCommand("cd .. && make start");
         String result = executeCommand("awslocal apigateway get-rest-apis");
         JSONObject object = new JSONObject(result);
         JSONArray array = object.getJSONArray("items");
@@ -34,7 +34,7 @@ public abstract class LocalstackTest {
 
     @AfterAll
     static void teardown() throws IOException, InterruptedException {
-        executeCommand("docker stop $(docker ps -a -q --filter ancestor=localstack/localstack --format=\"{{.ID}}\")");
+        //executeCommand("docker stop $(docker ps -a -q --filter ancestor=localstack/localstack --format=\"{{.ID}}\")");
     }
 
     private static String executeCommand(String command) throws IOException, InterruptedException {

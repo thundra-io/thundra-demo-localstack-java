@@ -5,7 +5,7 @@ plugins:
   - serverless-localstack
 
 package:
-  artifact: ./target/thundra-demo-localstack.jar
+  artifact: ./thundra-demo-localstack-java-app/target/thundra-demo-localstack.jar
 
 custom:
   region: us-east-1

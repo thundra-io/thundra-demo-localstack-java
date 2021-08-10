@@ -16,7 +16,6 @@ import io.thundra.demo.localstack.model.Message;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.List;
-import java.util.Map;
 
 import static io.thundra.demo.localstack.service.ClientBuilder.LOCALSTACK_HOSTNAME;
 import static io.thundra.demo.localstack.service.ClientBuilder.buildDynamoDB;
