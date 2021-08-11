@@ -19,8 +19,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 public abstract class LocalstackTest {
-    protected static final int ASSERT_EVENTUALLY_TIMEOUT_SECS = 30;
-    protected static String lambdaUrl;
+    protected static final int ASSERT_EVENTUALLY_TIMEOUT_SECS = 100;
+    protected String lambdaUrl;
 
     @BeforeEach
     void setup() throws IOException, InterruptedException {
@@ -37,7 +37,7 @@ public abstract class LocalstackTest {
         executeCommand("docker stop $(docker ps -a -q --filter ancestor=localstack/localstack --format=\"{{.ID}}\")");
     }
 
-    private static String executeCommand(String command) throws IOException, InterruptedException {
+    private String executeCommand(String command) throws IOException, InterruptedException {
         boolean isWindows = System.getProperty("os.name").toLowerCase().startsWith("windows");
         ProcessBuilder builder = new ProcessBuilder();
         if (isWindows) {
@@ -62,7 +62,7 @@ public abstract class LocalstackTest {
         AssertionError assertionError = null;
         while (System.currentTimeMillis() < deadline) {
             try {
-                Thread.sleep(10000);
+                Thread.sleep(20000);
             } catch (InterruptedException e) {
             }
             try {

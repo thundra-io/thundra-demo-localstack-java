@@ -206,7 +206,7 @@
                 <version>${maven-surefire-plugin.version}</version>
                 <configuration>
                     <argLine>
-                        -javaagent:/Users/tolgatakir/development/thundra/thundra-agent-java/thundra-agent-bootstrap/target/thundra-agent-bootstrap.jar
+                        -javaagent:/Users/tolgatakir/development/thundra/agent/thundra-agent-bootstrap.jar
                         -Dthundra.apiKey=7d13fbdc-f91d-4371-b974-afca1c9e2fb1
                         -Dthundra.agent.test.project.id=fff2936b-430a-4599-a2ec-ba7cddbfb137
                         -Dthundra.agent.debug.enable=true
