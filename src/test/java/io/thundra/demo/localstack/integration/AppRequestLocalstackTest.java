@@ -21,7 +21,7 @@ public class AppRequestLocalstackTest extends LocalstackTest {
         ResponseEntity<Response> responseEntity = post(lambdaUrl, Response.class);
         assertThat(responseEntity.getStatus()).isEqualTo(HttpStatus.SC_OK);
         Response response = responseEntity.getBody();
-        assertThat(response.getRequestID()).isNotBlank();
+        assertThat(response.getRequestId()).isNotBlank();
         assertThat(response.getStatus()).isEqualTo("QUEUED");
         assertEventually(() -> {
             try {
@@ -32,9 +32,9 @@ public class AppRequestLocalstackTest extends LocalstackTest {
                 assertThat(getResponse)
                         .extracting("requestId", "status")
                         .contains(
-                                Tuple.tuple(response.getRequestID(), "QUEUED"),
-                                Tuple.tuple(response.getRequestID(), "PROCESSING"),
-                                Tuple.tuple(response.getRequestID(), "FINISHED")
+                                Tuple.tuple(response.getRequestId(), "QUEUED"),
+                                Tuple.tuple(response.getRequestId(), "PROCESSING"),
+                                Tuple.tuple(response.getRequestId(), "FINISHED")
                         );
             } catch (IOException e) {
                 throw new AssertionError(e);

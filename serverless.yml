@@ -8,10 +8,16 @@ package:
   artifact: ./target/thundra-demo-localstack.jar
 
 custom:
+  stage: local
   region: us-east-1
-  accountID: '000000000000'
+  accountId: '000000000000'
+  deploymentBucketName: ${self:service}-deployment-bucket-${self:custom.stage}
+  tableName: ${self:service}-app-requests-${self:custom.stage}
+  bucketName: ${self:service}-archive-bucket-${self:custom.stage}
+  queueName: ${self:service}-request-queue-${self:custom.stage}
+  topicName: ${self:service}-request-topic-${self:custom.stage}
   localstack:
-    stages: [local]
+    stages: [ local ]
     debug: true
     autostart: true
     # lambda:
@@ -19,17 +25,23 @@ custom:
 
 provider:
   name: aws
-  stage: local
-  region: us-east-1
+  runtime: java8
+  stage: ${self:custom.stage}
+  region: ${self:custom.region}
   memorySize: 512
   timeout: 60
   deploymentBucket:
-    name: thundra-demo-localstack-bucket
+    name: ${self:custom.deploymentBucketName}
+  environment:
+    TABLE_NAME: ${self:custom.tableName}
+    QUEUE_URL: http://172.17.0.2:4566/${self:custom.accountId}/${self:custom.queueName}
+    S3_BUCKET: ${self:custom.bucketName}
+    SNS_ARN: arn:aws:sns:${self:custom.region}:${self:custom.accountId}:${self:custom.topicName}
+
 
 functions:
   http_handleRequest:
     handler: io.thundra.demo.localstack.handler.App
-    runtime: java8
     events:
       - http:
           path: /requests
@@ -39,38 +51,36 @@ functions:
           method: get
   backend_processRequest:
     handler: io.thundra.demo.localstack.handler.Processing
-    runtime: java8
     events:
       - sqs:
           arn:
             Fn::GetAtt: [ requestQueue, Arn ]
   backend_archiveResult:
     handler: io.thundra.demo.localstack.handler.Archive
-    runtime: java8
     events:
-      - sns: requestTopic
+      - sns: ${self:custom.topicName}
 
 resources:
   Resources:
     appDatabase:
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: appRequests
+        TableName: ${self:custom.tableName}
         AttributeDefinitions:
           - AttributeName: id
             AttributeType: S
-          - AttributeName: requestID
+          - AttributeName: requestId
             AttributeType: S
         KeySchema:
           - AttributeName: id
             KeyType: HASH
-          - AttributeName: requestID
+          - AttributeName: requestId
             KeyType: RANGE
     archiveBucket:
       Type: AWS::S3::Bucket
       Properties:
-        BucketName: archivebucket
+        BucketName: ${self:custom.bucketName}
     requestQueue:
       Type: AWS::SQS::Queue
       Properties:
-        QueueName: requestQueue
+        QueueName: ${self:custom.queueName}

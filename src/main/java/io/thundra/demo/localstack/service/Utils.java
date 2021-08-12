@@ -4,7 +4,7 @@ import java.util.UUID;
 
 public class Utils {
     private Utils() {
-        throw new IllegalStateException("Not create instance from utility class");
+        throw new IllegalStateException("Not create instance from Utils class");
     }
 
     public static String generateShortUuid() {

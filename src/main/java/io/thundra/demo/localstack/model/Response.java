@@ -1,23 +1,23 @@
 package io.thundra.demo.localstack.model;
 
 public class Response {
-    private String requestID;
+    private String requestId;
     private String status;
 
     public Response() {
     }
 
-    public Response(String requestID, String status) {
-        this.requestID = requestID;
+    public Response(String requestId, String status) {
+        this.requestId = requestId;
         this.status = status;
     }
 
-    public String getRequestID() {
-        return requestID;
+    public String getRequestId() {
+        return requestId;
     }
 
-    public void setRequestID(String requestID) {
-        this.requestID = requestID;
+    public void setRequestId(String requestId) {
+        this.requestId = requestId;
     }
 
     public String getStatus() {

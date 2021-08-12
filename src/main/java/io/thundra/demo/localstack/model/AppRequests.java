@@ -5,7 +5,7 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBRangeKey;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 
-@DynamoDBTable(tableName = "appRequests")
+@DynamoDBTable(tableName = "app-requests")// table name must be overridden on each call
 public class AppRequests {
     private String id;
     private String requestId;
@@ -31,7 +31,7 @@ public class AppRequests {
         this.id = id;
     }
 
-    @DynamoDBRangeKey(attributeName = "requestID")
+    @DynamoDBRangeKey(attributeName = "requestId")
     public String getRequestId() {
         return requestId;
     }
