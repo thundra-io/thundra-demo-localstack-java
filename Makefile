@@ -4,7 +4,7 @@ export AWS_ACCESS_KEY_ID ?= test
 export AWS_SECRET_ACCESS_KEY ?= test
 export AWS_DEFAULT_REGION ?= us-east-1
 export START_WEB ?= 1
-export THUNDRA_APIKEY = 7d13fbdc-f91d-4371-b974-afca1c9e2fb1
+export THUNDRA_APIKEY = <YOUR-THUNDRA-API-KEY-HERE>
 usage:           ## Show this help
 	@fgrep -h "##" $(MAKEFILE_LIST) | fgrep -v fgrep | sed -e 's/\\$$//' | sed -e 's/##//'
 
