@@ -17,15 +17,16 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @author tol
+ * @author tolga
  */
 public class App implements RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
 
     private static final Logger logger = LogManager.getLogger(App.class);
-    private final ObjectMapper mapper = new ObjectMapper();
-    private static final Map<String, String> HEADERS = new HashMap<String, String>() {{
+    private static final Map<String, String> headers = new HashMap<String, String>() {{
         put("content-type", "application/json");
     }};
+
+    private final ObjectMapper mapper = new ObjectMapper();
     private AppRequestService appRequestService = new AppRequestService();
 
     @Override
@@ -57,16 +58,16 @@ public class App implements RequestHandler<APIGatewayProxyRequestEvent, APIGatew
         appRequestService.addAppRequest(requestId, status);
         return new APIGatewayProxyResponseEvent().
                 withStatusCode(200).
-                withHeaders(HEADERS).
+                withHeaders(headers).
                 withBody(mapper.writeValueAsString(new Response(requestId, status)));
     }
-
 
     private APIGatewayProxyResponseEvent listRequests() throws JsonProcessingException {
         List<AppRequests> response = appRequestService.listAppRequests();
         return new APIGatewayProxyResponseEvent().
                 withStatusCode(200).
-                withHeaders(HEADERS).
+                withHeaders(headers).
                 withBody(mapper.writeValueAsString(response));
     }
+
 }

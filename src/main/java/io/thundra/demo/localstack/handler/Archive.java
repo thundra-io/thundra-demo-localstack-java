@@ -11,8 +11,13 @@ import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * @author tolga
+ */
 public class Archive implements RequestHandler<SNSEvent, Void> {
+
     private static final Logger logger = LogManager.getLogger(Archive.class);
+
     private AppRequestService appRequestService = new AppRequestService();
 
     @Override
@@ -34,4 +39,5 @@ public class Archive implements RequestHandler<SNSEvent, Void> {
         });
         return null;
     }
+
 }

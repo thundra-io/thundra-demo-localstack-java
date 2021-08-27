@@ -11,8 +11,13 @@ import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * @author tolga
+ */
 public class Processing implements RequestHandler<SQSEvent, Void> {
+
     private static final Logger logger = LogManager.getLogger(Processing.class);
+
     private AppRequestService appRequestService = new AppRequestService();
 
     @Override
@@ -35,6 +40,5 @@ public class Processing implements RequestHandler<SQSEvent, Void> {
         });
         return null;
     }
-
 
 }

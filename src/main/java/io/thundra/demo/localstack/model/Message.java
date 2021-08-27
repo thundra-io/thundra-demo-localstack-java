@@ -1,6 +1,10 @@
 package io.thundra.demo.localstack.model;
 
+/**
+ * @author tolga
+ */
 public class Message {
+
     private String requestId;
 
     public Message() {
@@ -17,4 +21,5 @@ public class Message {
     public void setRequestId(String requestId) {
         this.requestId = requestId;
     }
+
 }

@@ -17,16 +17,20 @@ import io.thundra.demo.localstack.model.Message;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.List;
-import java.util.Map;
 
-import static io.thundra.demo.localstack.service.ClientBuilder.LOCALSTACK_HOSTNAME;
-import static io.thundra.demo.localstack.service.ClientBuilder.buildDynamoDB;
-import static io.thundra.demo.localstack.service.ClientBuilder.buildS3;
-import static io.thundra.demo.localstack.service.ClientBuilder.buildSNS;
-import static io.thundra.demo.localstack.service.ClientBuilder.buildSQS;
+import static io.thundra.demo.localstack.service.ClientBuilder.*;
 import static io.thundra.demo.localstack.service.Utils.generateShortUuid;
 
+/**
+ * @author tolga
+ */
 public class AppRequestService {
+
+    public static final String REQUEST_QUEUE_URL =
+            ClientBuilder.normalizeUrl(System.getenv("REQUEST_QUEUE_URL"));
+    public static final String REQUEST_TOPIC_ARN = System.getenv("REQUEST_TOPIC_ARN");
+    public static final String ARCHIVE_BUCKET_NAME = System.getenv("ARCHIVE_BUCKET_NAME");
+
     private final ObjectMapper mapper = new ObjectMapper();
     public static final String QUEUE_URL = System.getenv("QUEUE_URL");
     public static final String SNS_ARN = System.getenv("SNS_ARN");
@@ -53,7 +57,7 @@ public class AppRequestService {
         Message message = new Message(requestId);
         SendMessageRequest sendMessageRequest = new SendMessageRequest()
                 .withMessageBody(mapper.writeValueAsString(message))
-                .withQueueUrl(QUEUE_URL);
+                .withQueueUrl(REQUEST_QUEUE_URL);
         sqs.sendMessage(sendMessageRequest);
     }
 
@@ -61,7 +65,7 @@ public class AppRequestService {
         Message message = new Message(requestId);
         PublishRequest publishRequest = new PublishRequest()
                 .withMessage(mapper.writeValueAsString(message))
-                .withTopicArn(SNS_ARN);
+                .withTopicArn(REQUEST_TOPIC_ARN);
         sns.publish(publishRequest);
     }
 
@@ -77,7 +81,8 @@ public class AppRequestService {
     }
 
     public void archiveAppRequest(String requestId) {
-        s3.putObject(S3_BUCKET, requestId + "/result.txt", "Archive result for request " + requestId);
+        AmazonS3 s3 = buildS3();
+        s3.putObject(ARCHIVE_BUCKET_NAME, requestId + "/result.txt", "Archive result for request " + requestId);
     }
 
     public String getRequestId(String body) throws IOException {
@@ -90,4 +95,5 @@ public class AppRequestService {
                 .withTableNameOverride(DynamoDBMapperConfig.TableNameOverride.withTableNameReplacement(TABLE_NAME))
                 .build());
     }
+
 }

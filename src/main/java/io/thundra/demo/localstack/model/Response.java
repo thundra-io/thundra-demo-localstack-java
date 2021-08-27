@@ -1,6 +1,10 @@
 package io.thundra.demo.localstack.model;
 
+/**
+ * @author tolga
+ */
 public class Response {
+
     private String requestId;
     private String status;
 
@@ -27,4 +31,5 @@ public class Response {
     public void setStatus(String status) {
         this.status = status;
     }
+
 }

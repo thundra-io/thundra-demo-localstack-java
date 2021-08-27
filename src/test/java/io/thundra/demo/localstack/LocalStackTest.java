@@ -18,7 +18,11 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-public abstract class LocalstackTest {
+/**
+ * @author tolga
+ */
+public abstract class LocalStackTest {
+
     protected static final int ASSERT_EVENTUALLY_TIMEOUT_SECS = 100;
     protected String lambdaUrl;
 
@@ -125,6 +129,7 @@ public abstract class LocalstackTest {
     }
 
     public class ResponseEntity<R> {
+
         private int status;
         private R body;
 
@@ -148,5 +153,7 @@ public abstract class LocalstackTest {
         public void setBody(R body) {
             this.body = body;
         }
+
     }
+
 }

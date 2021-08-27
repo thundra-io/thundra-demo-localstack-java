@@ -29,8 +29,4 @@ start:           ## Build, deploy and start the app locally
 	@make build;
 	@make deploy;
 
-lint:            ## Run code linter
-	@npm run lint
-	@flake8 demo
-
-.PHONY: usage install start lint
+.PHONY: usage install build test deploy start

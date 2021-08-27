@@ -1,12 +1,5 @@
 service: thundra-demo-localstack
 
-plugins:
-  - serverless-deployment-bucket
-  - serverless-localstack
-
-package:
-  artifact: ./target/thundra-demo-localstack.jar
-
 custom:
   stage: local
   region: us-east-1
@@ -17,11 +10,19 @@ custom:
   queueName: ${self:service}-request-queue-${self:custom.stage}
   topicName: ${self:service}-request-topic-${self:custom.stage}
   localstack:
+    stages:
+      # list of stages for which the plugin should be enabled
+      - local
     stages: [ local ]
     debug: true
     autostart: true
-    # lambda:
-    #   mountCode: true
+
+plugins:
+  - serverless-deployment-bucket
+  - serverless-localstack # only activated when stage is "local"
+
+package:
+  artifact: ./target/thundra-demo-localstack.jar
 
 provider:
   name: aws
@@ -30,6 +31,10 @@ provider:
   region: ${self:custom.region}
   memorySize: 512
   timeout: 60
+  stage: ${opt:stage, "local"}
+  region: ${opt:region, "us-east-1"}
+  memorySize: ${opt:memory, 512}
+  timeout: ${opt:timeout, 60}
   deploymentBucket:
     name: ${self:custom.deploymentBucketName}
   environment:
@@ -38,6 +43,14 @@ provider:
     S3_BUCKET: ${self:custom.bucketName}
     SNS_ARN: arn:aws:sns:${self:custom.region}:${self:custom.accountId}:${self:custom.topicName}
 
+    name: thundra-demo-localstack-bucket
+  environment:
+    REQUEST_QUEUE_URL:
+      Ref: requestQueue
+    REQUEST_TOPIC_ARN:
+      Ref: requestTopic
+    ARCHIVE_BUCKET_NAME: archivebucket
+    #THUNDRA_APIKEY: <YOUR-THUNDRA-API-KEY-HERE>
 
 functions:
   http_handleRequest:
@@ -59,6 +72,10 @@ functions:
     handler: io.thundra.demo.localstack.handler.Archive
     events:
       - sns: ${self:custom.topicName}
+      - sns:
+          arn:
+            Fn::GetAtt: [ requestTopic, Arn ]
+          topicName: requestTopic
 
 resources:
   Resources:
@@ -84,3 +101,8 @@ resources:
       Type: AWS::SQS::Queue
       Properties:
         QueueName: ${self:custom.queueName}
+        QueueName: requestQueue
+    requestTopic:
+      Type: AWS::SNS::Topic
+      Properties:
+        TopicName: requestTopic

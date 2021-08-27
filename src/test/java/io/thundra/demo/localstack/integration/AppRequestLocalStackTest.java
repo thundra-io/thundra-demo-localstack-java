@@ -1,7 +1,7 @@
 package io.thundra.demo.localstack.integration;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import io.thundra.demo.localstack.LocalstackTest;
+import io.thundra.demo.localstack.LocalStackTest;
 import io.thundra.demo.localstack.model.AppRequests;
 import io.thundra.demo.localstack.model.Response;
 import org.apache.http.HttpStatus;
@@ -13,8 +13,10 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-
-public class AppRequestLocalstackTest extends LocalstackTest {
+/**
+ * @author tolga
+ */
+public class AppRequestLocalStackTest extends LocalStackTest {
 
     @Test
     public void testCreateNewRequest() throws IOException {
@@ -41,4 +43,5 @@ public class AppRequestLocalstackTest extends LocalstackTest {
             }
         });
     }
+
 }
