@@ -66,7 +66,7 @@ public abstract class LocalStackTest {
         AssertionError assertionError = null;
         while (System.currentTimeMillis() < deadline) {
             try {
-                Thread.sleep(20000);
+                Thread.sleep(1000);
             } catch (InterruptedException e) {
             }
             try {

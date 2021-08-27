@@ -30,23 +30,29 @@ public class AppRequestService {
             ClientBuilder.normalizeUrl(System.getenv("REQUEST_QUEUE_URL"));
     public static final String REQUEST_TOPIC_ARN = System.getenv("REQUEST_TOPIC_ARN");
     public static final String ARCHIVE_BUCKET_NAME = System.getenv("ARCHIVE_BUCKET_NAME");
+    public static final String APP_REQUESTS_TABLE_NAME = System.getenv("APP_REQUESTS_TABLE_NAME");
 
     private final ObjectMapper mapper = new ObjectMapper();
-    public static final String QUEUE_URL = System.getenv("QUEUE_URL");
-    public static final String SNS_ARN = System.getenv("SNS_ARN");
-    private static final String S3_BUCKET = System.getenv("S3_BUCKET");
-    private static final String TABLE_NAME = System.getenv("TABLE_NAME");
 
     private final AmazonSQS sqs;
     private final AmazonSNS sns;
     private final AmazonDynamoDB dynamoDB;
+    private final DynamoDBMapper dynamoDBMapper;
     private final AmazonS3 s3;
 
     public AppRequestService() {
         this.sqs = buildSQS();
         this.sns = buildSNS();
         this.dynamoDB = buildDynamoDB();
+        this.dynamoDBMapper = buildDynamoDBMapper(dynamoDB);
         this.s3 = buildS3();
+    }
+
+    private DynamoDBMapper buildDynamoDBMapper(AmazonDynamoDB dynamoDB) {
+        return new DynamoDBMapper(dynamoDB, DynamoDBMapperConfig.builder()
+                .withTableNameOverride(
+                        DynamoDBMapperConfig.TableNameOverride.withTableNameReplacement(APP_REQUESTS_TABLE_NAME))
+                .build());
     }
 
     public String generateRequestId() {
@@ -70,30 +76,22 @@ public class AppRequestService {
     }
 
     public void addAppRequest(String requestId, String status) {
-        AppRequests item = new AppRequests(generateShortUuid(), requestId, "" + Calendar.getInstance().getTime(), status);
-        DynamoDBMapper dynamoDBMapper = buildDynamoDBMapper();
+        AppRequests item = new AppRequests(
+                generateShortUuid(), requestId, "" + Calendar.getInstance().getTime(), status);
         dynamoDBMapper.save(item);
     }
 
     public List<AppRequests> listAppRequests() {
-        DynamoDBMapper dynamoDBMapper = buildDynamoDBMapper();
         return dynamoDBMapper.scan(AppRequests.class, new DynamoDBScanExpression());
     }
 
     public void archiveAppRequest(String requestId) {
-        AmazonS3 s3 = buildS3();
         s3.putObject(ARCHIVE_BUCKET_NAME, requestId + "/result.txt", "Archive result for request " + requestId);
     }
 
     public String getRequestId(String body) throws IOException {
         Message event = mapper.readValue(body, Message.class);
         return event.getRequestId();
-    }
-
-    private DynamoDBMapper buildDynamoDBMapper() {
-        return new DynamoDBMapper(dynamoDB, DynamoDBMapperConfig.builder()
-                .withTableNameOverride(DynamoDBMapperConfig.TableNameOverride.withTableNameReplacement(TABLE_NAME))
-                .build());
     }
 
 }
