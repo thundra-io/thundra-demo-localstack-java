@@ -6,7 +6,7 @@ plugins:
 
 custom:
   stage: ${opt:stage, "local"}
-  region:  ${opt:region, "us-east-1"}
+  region: ${opt:region, "us-east-1"}
   artifact: ${opt:artifact, "./target/thundra-demo-localstack.jar"}
   deploymentBucketName: ${self:service}-deployment-bucket-${self:custom.stage}
   tableName: ${self:service}-app-requests-${self:custom.stage}
@@ -56,13 +56,13 @@ functions:
     events:
       - sqs:
           arn:
-            Fn::GetAtt: [ requestQueue, Arn ]
+            Fn::GetAtt: [requestQueue, Arn]
   backend_archiveResult:
     handler: io.thundra.demo.localstack.handler.Archive
     events:
       - sns:
           arn:
-            Fn::GetAtt: [ requestTopic, Arn ]
+            Fn::GetAtt: [requestTopic, Arn]
           topicName: ${self:custom.topicName}
 
 resources:

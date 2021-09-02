@@ -25,7 +25,7 @@ test:               ## Test app
 
 deploy:             ## Deploy the app locally
 	echo "Deploying Serverless app to local environment ..."
-	SLS_DEBUG=1 serverless deploy --stage local
+	SLS_DEBUG=1 serverless deploy --stage local --region ${AWS_DEFAULT_REGION}
 
 start:              ## Build, deploy and start the app locally
 	@make build;
@@ -33,7 +33,7 @@ start:              ## Build, deploy and start the app locally
 
 deploy-forwarded:   ## Deploy the app locally in forwarded mode
 	echo "Deploying Serverless app to local environment ..."
-	LAMBDA_FORWARD_URL=http://${DOCKER_BRIDGE}:8080 SLS_DEBUG=1 serverless deploy --stage local --artifact null.zip
+	LAMBDA_FORWARD_URL=http://${DOCKER_BRIDGE}:8080 SLS_DEBUG=1 serverless deploy --stage local --region ${AWS_DEFAULT_REGION} --artifact null.zip
 
 start-embedded:     ## Deploy and start the app embedded in forwarded mode from Localstack
 	@make deploy-forwarded;
