@@ -166,6 +166,12 @@
             <artifactId>thundra-agent-bootstrap</artifactId>
             <version>${thundra.agent.version}</version>
             <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <!-- ========================================== -->
 
