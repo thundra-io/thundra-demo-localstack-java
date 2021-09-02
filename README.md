@@ -1,6 +1,6 @@
 # Thundra LocalStack Demo
 
-Simple demo application deployed to LocalStac and monitored/traced/debugged by Thundra
+Simple demo application deployed to LocalStack and monitored/traced/debugged by Thundra
 
 ## Prerequisites
 
@@ -18,16 +18,17 @@ Install the dependencies using this command:
 make install
 ```
 
-Set your Thundra API key into `Makefile`
+Set your Thundra API key and project id into `Makefile`
 ```
 export THUNDRA_APIKEY = <YOUR-THUNDRA-API-KEY-HERE>
+export THUNDRA_AGENT_TEST_PROJECT_ID = <YOUR-THUNDRA-PROJECT-ID-HERE>
 ```
 
 ## Running
 
 Start the application locally in LocalStack:
 ```
-make start
+make start-embedded
 ```
 
 ## Testing

@@ -3,6 +3,7 @@ package io.thundra.demo.localstack;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.thundra.agent.lambda.localstack.LambdaServer;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -11,7 +12,9 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 
 import java.io.BufferedReader;
@@ -24,11 +27,19 @@ import java.io.InputStreamReader;
 public abstract class LocalStackTest {
 
     protected static final int ASSERT_EVENTUALLY_TIMEOUT_SECS = 100;
+
     protected String lambdaUrl;
 
+    @BeforeAll
+    static void beforeAll() throws Exception {
+        LambdaServer.start();
+    }
+
     @BeforeEach
-    void setup() throws IOException, InterruptedException {
-        executeCommand("make start");
+    void setup() throws Exception {
+        LambdaServer.reset();
+
+        executeCommand("make start-embedded");
         String result = executeCommand("awslocal apigateway get-rest-apis");
         JSONObject object = new JSONObject(result);
         JSONArray array = object.getJSONArray("items");
@@ -39,6 +50,11 @@ public abstract class LocalStackTest {
     @AfterEach
     void teardown() throws IOException, InterruptedException {
         executeCommand("docker stop $(docker ps -a -q --filter ancestor=localstack/localstack --format=\"{{.ID}}\")");
+    }
+
+    @AfterAll
+    static void afterAll() throws Exception {
+        LambdaServer.stop();
     }
 
     private String executeCommand(String command) throws IOException, InterruptedException {
@@ -116,6 +132,10 @@ public abstract class LocalStackTest {
 
     public static <T> T retrieveResourceFromResponse(HttpResponse response, TypeReference<T> clazz) throws IOException {
         String jsonFromResponse = EntityUtils.toString(response.getEntity());
+        JSONObject responseObj = new JSONObject(jsonFromResponse);
+        if (responseObj.has("body")) {
+            jsonFromResponse = responseObj.getString("body");
+        }
         ObjectMapper mapper = new ObjectMapper()
                 .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         return mapper.readValue(jsonFromResponse, clazz);
@@ -123,6 +143,10 @@ public abstract class LocalStackTest {
 
     public static <T> T retrieveResourceFromResponse(HttpResponse response, Class<T> clazz) throws IOException {
         String jsonFromResponse = EntityUtils.toString(response.getEntity());
+        JSONObject responseObj = new JSONObject(jsonFromResponse);
+        if (responseObj.has("body")) {
+            jsonFromResponse = responseObj.getString("body");
+        }
         ObjectMapper mapper = new ObjectMapper()
                 .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         return mapper.readValue(jsonFromResponse, clazz);
@@ -130,20 +154,20 @@ public abstract class LocalStackTest {
 
     public class ResponseEntity<R> {
 
-        private int status;
+        private int statusCode;
         private R body;
 
-        public ResponseEntity(int status, R body) {
-            this.status = status;
+        public ResponseEntity(int statusCode, R body) {
+            this.statusCode = statusCode;
             this.body = body;
         }
 
-        public int getStatus() {
-            return status;
+        public int getStatusCode() {
+            return statusCode;
         }
 
-        public void setStatus(int status) {
-            this.status = status;
+        public void setStatusCode(int statusCode) {
+            this.statusCode = statusCode;
         }
 
         public R getBody() {

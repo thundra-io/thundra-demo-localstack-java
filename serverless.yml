@@ -7,6 +7,7 @@ plugins:
 custom:
   stage: ${opt:stage, "local"}
   region:  ${opt:region, "us-east-1"}
+  artifact: ${opt:artifact, "./target/thundra-demo-localstack.jar"}
   deploymentBucketName: ${self:service}-deployment-bucket-${self:custom.stage}
   tableName: ${self:service}-app-requests-${self:custom.stage}
   bucketName: ${self:service}-archive-bucket-${self:custom.stage}
@@ -20,7 +21,7 @@ custom:
     autostart: true
 
 package:
-  artifact: ./target/thundra-demo-localstack.jar
+  artifact: ${self:custom.artifact}
 
 provider:
   name: aws
@@ -38,7 +39,7 @@ provider:
     REQUEST_TOPIC_ARN:
       Ref: requestTopic
     ARCHIVE_BUCKET_NAME: ${self:custom.bucketName}
-    #THUNDRA_APIKEY: <YOUR-THUNDRA-API-KEY-HERE>
+    THUNDRA_APIKEY: ${env:THUNDRA_APIKEY}
 
 functions:
   http_handleRequest:

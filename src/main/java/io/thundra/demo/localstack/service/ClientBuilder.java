@@ -63,7 +63,9 @@ public class ClientBuilder {
     }
 
     public static AmazonS3 buildS3() {
-        return buildClient(AmazonS3ClientBuilder.standard()).build();
+        return buildClient(AmazonS3ClientBuilder.standard()).
+                withPathStyleAccessEnabled(LOCALSTACK_ENDPOINT != null).
+                build();
     }
 
     public static AmazonSNS buildSNS() {

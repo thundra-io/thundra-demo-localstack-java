@@ -21,7 +21,7 @@ public class AppRequestLocalStackTest extends LocalStackTest {
     @Test
     public void testCreateNewRequest() throws IOException {
         ResponseEntity<Response> responseEntity = post(lambdaUrl, Response.class);
-        assertThat(responseEntity.getStatus()).isEqualTo(HttpStatus.SC_OK);
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.SC_OK);
         Response response = responseEntity.getBody();
         assertThat(response.getRequestId()).isNotBlank();
         assertThat(response.getStatus()).isEqualTo("QUEUED");
@@ -29,7 +29,7 @@ public class AppRequestLocalStackTest extends LocalStackTest {
             try {
                 ResponseEntity<List<AppRequests>> getResponseEntity = get(lambdaUrl, new TypeReference<List<AppRequests>>() {
                 });
-                assertThat(getResponseEntity.getStatus()).isEqualTo(HttpStatus.SC_OK);
+                assertThat(getResponseEntity.getStatusCode()).isEqualTo(HttpStatus.SC_OK);
                 List<AppRequests> getResponse = getResponseEntity.getBody();
                 assertThat(getResponse)
                         .extracting("requestId", "status")
