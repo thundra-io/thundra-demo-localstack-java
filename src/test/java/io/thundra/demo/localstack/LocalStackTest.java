@@ -132,10 +132,6 @@ public abstract class LocalStackTest {
 
     public static <T> T retrieveResourceFromResponse(HttpResponse response, TypeReference<T> clazz) throws IOException {
         String jsonFromResponse = EntityUtils.toString(response.getEntity());
-        JSONObject responseObj = new JSONObject(jsonFromResponse);
-        if (responseObj.has("body")) {
-            jsonFromResponse = responseObj.getString("body");
-        }
         ObjectMapper mapper = new ObjectMapper()
                 .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         return mapper.readValue(jsonFromResponse, clazz);
@@ -143,10 +139,6 @@ public abstract class LocalStackTest {
 
     public static <T> T retrieveResourceFromResponse(HttpResponse response, Class<T> clazz) throws IOException {
         String jsonFromResponse = EntityUtils.toString(response.getEntity());
-        JSONObject responseObj = new JSONObject(jsonFromResponse);
-        if (responseObj.has("body")) {
-            jsonFromResponse = responseObj.getString("body");
-        }
         ObjectMapper mapper = new ObjectMapper()
                 .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         return mapper.readValue(jsonFromResponse, clazz);
