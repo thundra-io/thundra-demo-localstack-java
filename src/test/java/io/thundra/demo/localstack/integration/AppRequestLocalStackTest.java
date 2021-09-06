@@ -21,6 +21,8 @@ public class AppRequestLocalStackTest extends LocalStackTest {
     @Test
     public void testCreateNewRequest() throws IOException {
         ResponseEntity<Response> responseEntity = post(lambdaUrl, Response.class);
+
+        assertThat(responseEntity.getBody()).isNotNull();
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.SC_OK);
         Response response = responseEntity.getBody();
         assertThat(response.getRequestId()).isNotBlank();
@@ -43,5 +45,4 @@ public class AppRequestLocalStackTest extends LocalStackTest {
             }
         });
     }
-
 }

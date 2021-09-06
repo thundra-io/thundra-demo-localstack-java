@@ -14,3 +14,5 @@ buildNumber.properties
 .idea
 .serverless
 node_modules
+.venv
+.vscode

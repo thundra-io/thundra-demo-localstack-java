@@ -41,7 +41,7 @@ public class App implements RequestHandler<APIGatewayProxyRequestEvent, APIGatew
                 return new APIGatewayProxyResponseEvent().
                         withStatusCode(404);
             }
-        } catch (JsonProcessingException e) {
+        } catch (Exception e) {
             logger.error("Error occurred handling message. Exception is ", e);
             return new APIGatewayProxyResponseEvent().
                     withStatusCode(500).

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.thundra.agent.lambda.localstack.LambdaServer;
 import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
@@ -26,7 +27,7 @@ import java.io.InputStreamReader;
  */
 public abstract class LocalStackTest {
 
-    protected static final int ASSERT_EVENTUALLY_TIMEOUT_SECS = 100;
+    protected static final int ASSERT_EVENTUALLY_TIMEOUT_SECS = 40;
 
     protected String lambdaUrl;
 
@@ -82,7 +83,7 @@ public abstract class LocalStackTest {
         AssertionError assertionError = null;
         while (System.currentTimeMillis() < deadline) {
             try {
-                Thread.sleep(1000);
+                Thread.sleep(10 * 1000);
             } catch (InterruptedException e) {
             }
             try {
@@ -138,10 +139,14 @@ public abstract class LocalStackTest {
     }
 
     public static <T> T retrieveResourceFromResponse(HttpResponse response, Class<T> clazz) throws IOException {
-        String jsonFromResponse = EntityUtils.toString(response.getEntity());
-        ObjectMapper mapper = new ObjectMapper()
-                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        return mapper.readValue(jsonFromResponse, clazz);
+        if (response.getStatusLine().getStatusCode() >= HttpStatus.SC_OK && response.getStatusLine().getStatusCode() < HttpStatus.SC_BAD_REQUEST) {
+            String jsonFromResponse = EntityUtils.toString(response.getEntity());
+            ObjectMapper mapper = new ObjectMapper()
+                    .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+            return mapper.readValue(jsonFromResponse, clazz);
+        } else {
+            return null;
+        }
     }
 
     public class ResponseEntity<R> {
