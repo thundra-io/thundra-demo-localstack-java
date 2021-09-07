@@ -66,7 +66,8 @@ public final class ChaosInjector {
                 ErrorInjectorSpanListener.
                         builder().
                         errorType(AmazonDynamoDBException.class).
-                        errorMessage("As AWS CTO Werner Vogels said, \"Everything fails, all the time\" and so AWS DynamoDB").
+                        errorMessage("As AWS CTO Werner Vogels said, \"Everything fails, all the time.\"").
+                        injectPercentage(100).
                         build();
         FilteringSpanListener errorFilteringSpanListener =
                 FilteringSpanListener.
