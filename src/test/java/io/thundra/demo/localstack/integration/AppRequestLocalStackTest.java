@@ -1,6 +1,8 @@
 package io.thundra.demo.localstack.integration;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import io.thundra.agent.lambda.localstack.LambdaServer;
+import io.thundra.demo.localstack.ChaosInjector;
 import io.thundra.demo.localstack.LocalStackTest;
 import io.thundra.demo.localstack.model.AppRequests;
 import io.thundra.demo.localstack.model.Response;
@@ -20,6 +22,10 @@ public class AppRequestLocalStackTest extends LocalStackTest {
 
     @Test
     public void testCreateNewRequest() throws IOException {
+        // Inject DynamoDB chaos only for "backend_archiveResult" function
+        LambdaServer.registerFunctionEnvironmentInitializer(
+                ChaosInjector.createDynamoDBChaosInjector("backend_archiveResult"));
+
         ResponseEntity<Response> responseEntity = post(lambdaUrl, Response.class);
 
         assertThat(responseEntity.getBody()).isNotNull();

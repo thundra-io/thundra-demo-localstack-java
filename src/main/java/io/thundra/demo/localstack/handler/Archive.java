@@ -4,7 +4,6 @@ import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.amazonaws.services.lambda.runtime.events.SNSEvent;
 import io.thundra.demo.localstack.service.AppRequestService;
-import io.thundra.demo.localstack.service.ChaosInjector;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
@@ -33,7 +32,6 @@ public class Archive implements RequestHandler<SNSEvent, Void> {
                 //simulate processing delay
                 Thread.sleep(TimeUnit.SECONDS.toMillis(3));
                 //set request status to FINISHED
-                ChaosInjector.call();
                 appRequestService.addAppRequest(requestId, "FINISHED");
             } catch (IOException | InterruptedException e) {
                 logger.error("Error occurred handling message. Exception is ", e);

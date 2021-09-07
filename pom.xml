@@ -32,7 +32,7 @@
         <json.version>20160810</json.version>
         <log4j.version>1.2.17</log4j.version>
 
-        <thundra.agent.version>2.7.32</thundra.agent.version>
+        <thundra.agent.version>2.7.33</thundra.agent.version>
         <assertj-core.version>3.20.2</assertj-core.version>
         <junit5.version>5.7.2</junit5.version>
         <junit-platform-launcher.version>1.7.2</junit-platform-launcher.version>

@@ -21,6 +21,7 @@ import org.junit.jupiter.api.BeforeEach;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Map;
 
 /**
  * @author tolga
@@ -59,14 +60,29 @@ public abstract class LocalStackTest {
     }
 
     private String executeCommand(String command) throws IOException, InterruptedException {
+        return executeCommand(command, null);
+    }
+
+    private String executeCommand(String command, Map<String, String> envVars) throws IOException, InterruptedException {
         boolean isWindows = System.getProperty("os.name").toLowerCase().startsWith("windows");
+
         ProcessBuilder builder = new ProcessBuilder();
+
         if (isWindows) {
             builder.command("cmd.exe", "/c", command);
         } else {
             builder.command("sh", "-c", command);
         }
+
+        Map<String, String> processEnvVars = builder.environment();
+        if (envVars != null) {
+            for (Map.Entry<String, String> e : envVars.entrySet()) {
+                processEnvVars.put(e.getKey(), e.getValue());
+            }
+        }
+
         Process process = builder.start();
+
         process.waitFor();
 
         StringBuilder output = new StringBuilder();
