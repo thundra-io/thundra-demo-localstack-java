@@ -170,7 +170,7 @@
             <groupId>io.thundra.agent</groupId>
             <artifactId>thundra-agent-trace</artifactId>
             <version>${thundra.agent.version}</version>
-            <scope>provided</scope>
+            <scope>test</scope>
         </dependency>
         <!-- ========================================== -->
 
