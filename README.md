@@ -6,6 +6,7 @@ Simple demo application deployed to LocalStack and monitored/traced/debugged by 
 
 * LocalStack
 * Docker
+* Python 3+
 * JDK 8+
 * Maven 3+
 * Node.js / `npm`
