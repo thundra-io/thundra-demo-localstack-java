@@ -6,6 +6,7 @@ export AWS_DEFAULT_REGION ?= us-east-1
 export START_WEB ?= 1
 export THUNDRA_APIKEY = <YOUR-THUNDRA-API-KEY-HERE>
 export THUNDRA_AGENT_TEST_PROJECT_ID = <YOUR-THUNDRA-PROJECT-ID-HERE>
+export THUNDRA_AGENT_TRACE_INSTRUMENT_TRACEABLECONFIG = io.thundra.demo.localstack.*.*[traceLineByLine=true]
 
 usage:              ## Show this help
 	@fgrep -h "##" $(MAKEFILE_LIST) | fgrep -v fgrep | sed -e 's/\\$$//' | sed -e 's/##//'
