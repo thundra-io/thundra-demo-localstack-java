@@ -2,6 +2,10 @@
 
 Simple demo application deployed to LocalStack and monitored/traced/debugged by Thundra
 
+## API Design
+
+![API Design](./assets/localstack-demo-with-bg.drawio.png)
+
 ## Prerequisites
 
 * LocalStack
@@ -25,12 +29,35 @@ export THUNDRA_APIKEY = <YOUR-THUNDRA-API-KEY-HERE>
 export THUNDRA_AGENT_TEST_PROJECT_ID = <YOUR-THUNDRA-PROJECT-ID-HERE>
 ```
 
-## Running
+## Running the Application
 
 Start the application locally in LocalStack:
 ```
 make start-embedded
 ```
+
+## Running the Tests
+
+You don't need to start the application to run the tests. You can simply run the following command.
+
+```
+make test
+```
+
+This will run the tests with `start-embedded`. If you want to run the tests without Thundra's Lambda Server, you can update the `LocalStackTest.java` file to run the `make start` instead of the `make start-embedded`. However, since the deployment and cold starts takes time, it might fail. Ideally, you would start the application beforehand and remove `executeCommand()` from `LocalStackTest.java`.
+
+
+### Results
+
+If you set the `THUNDRA_APIKEY` and `THUNDRA_AGENT_TEST_PROJECT_ID` in the `Makefile`, Thundra Foresight and APM should show the following results.
+
+#### Thundra Foresight Testrun Detail
+
+![Foresight Testrun Detail](./assets/thundra-foresight-testrun-detail.png)
+
+#### Thundra APM Trace Map
+
+![APM Trace Map](./assets/thundra-apm-tracemap.png)
 
 ## Testing
 
