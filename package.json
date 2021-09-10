@@ -1,0 +1,31 @@
+{
+  "name": "thundra-demo-localstack",
+  "version": "1.0.0",
+  "description": "Thundra LocalStack demo application",
+  "dependencies": {
+    "uuid": "^3.4.0"
+  },
+  "devDependencies": {
+    "aws-sdk": "^2.764.0",
+    "axios": "^0.21.1",
+    "eslint": "^6.8.0",
+    "lodash": "^4.17.21",
+    "mixin-deep": ">=1.3.2",
+    "serverless": "^2.4.0",
+    "serverless-deployment-bucket": "^1.1.2",
+    "serverless-localstack": "^0.4.34",
+    "set-value": "^3.0.2"
+  },
+  "scripts": {
+    "build": "make build",
+    "test": "make test",
+    "start": "make start"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/thundra-io/thundra-demo-localstack-java"
+  },
+  "author": "Serkan Özal",
+  "license": "Apache 2.0",
+  "homepage": "https://github.com/thundra-io/thundra-demo-localstack-java#readme"
+}

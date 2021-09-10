@@ -1,0 +1,96 @@
+service: thundra-demo-localstack
+
+plugins:
+  - serverless-deployment-bucket
+  - serverless-localstack # only activated when stage is "local"
+
+custom:
+  stage: ${opt:stage, "local"}
+  region: ${opt:region, "us-east-1"}
+  artifact: ${opt:artifact, "./target/thundra-demo-localstack.jar"}
+  deploymentBucketName: ${self:service}-deployment-bucket-${self:custom.stage}
+  tableName: ${self:service}-app-requests-${self:custom.stage}
+  bucketName: ${self:service}-archive-bucket-${self:custom.stage}
+  queueName: ${self:service}-request-queue-${self:custom.stage}
+  topicName: ${self:service}-request-topic-${self:custom.stage}
+  localstack:
+    stages:
+      # list of stages for which the plugin should be enabled
+      - local
+    debug: true
+    autostart: true
+
+package:
+  artifact: ${self:custom.artifact}
+
+provider:
+  name: aws
+  runtime: java8
+  stage: ${self:custom.stage}
+  region: ${self:custom.region}
+  memorySize: ${opt:memory, 512}
+  timeout: ${opt:timeout, 60}
+  deploymentBucket:
+    name: ${self:custom.deploymentBucketName}
+  environment:
+    APP_REQUESTS_TABLE_NAME: ${self:custom.tableName}
+    REQUEST_QUEUE_URL:
+      Ref: requestQueue
+    REQUEST_TOPIC_ARN:
+      Ref: requestTopic
+    ARCHIVE_BUCKET_NAME: ${self:custom.bucketName}
+    THUNDRA_APIKEY: ${env:THUNDRA_APIKEY}
+
+functions:
+  http_handleRequest:
+    handler: io.thundra.demo.localstack.handler.App
+    events:
+      - http:
+          path: /requests
+          method: post
+      - http:
+          path: /requests
+          method: get
+  backend_processRequest:
+    handler: io.thundra.demo.localstack.handler.Processing
+    events:
+      - sqs:
+          arn:
+            Fn::GetAtt: [requestQueue, Arn]
+  backend_archiveResult:
+    handler: io.thundra.demo.localstack.handler.Archive
+    events:
+      - sns:
+          arn:
+            Fn::GetAtt: [requestTopic, Arn]
+          topicName: ${self:custom.topicName}
+
+resources:
+  Resources:
+    appDatabase:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:custom.tableName}
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+          - AttributeName: requestId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+          - AttributeName: requestId
+            KeyType: RANGE
+    archiveBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:custom.bucketName}
+    requestQueue:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: ${self:custom.queueName}
+        VisibilityTimeout: 60
+    requestTopic:
+      Type: AWS::SNS::Topic
+      Properties:
+        TopicName: ${self:custom.topicName}
