@@ -1,8 +1,8 @@
 package io.thundra.demo.localstack;
 
 import com.amazonaws.services.dynamodbv2.model.AmazonDynamoDBException;
-import io.thundra.agent.lambda.localstack.FunctionEnvironmentInfo;
 import io.thundra.agent.lambda.localstack.FunctionEnvironmentInitializer;
+import io.thundra.agent.lambda.localstack.domain.FunctionEnvironmentInfo;
 import io.thundra.agent.trace.TraceSupport;
 import io.thundra.agent.trace.span.impl.ErrorInjectorSpanListener;
 import io.thundra.agent.trace.span.impl.FilteringSpanListener;
