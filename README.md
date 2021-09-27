@@ -1,6 +1,6 @@
 # Thundra LocalStack Demo
 
-Simple demo application deployed to LocalStack and monitored/traced/debugged by Thundra
+Simple Java demo application deployed to LocalStack and monitored/traced/debugged by Thundra
 
 ## API Design
 
