@@ -3,6 +3,7 @@ package io.thundra.demo.localstack;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.thundra.agent.core.util.StringUtils;
 import io.thundra.agent.lambda.localstack.LambdaServer;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -17,28 +18,56 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.mockserver.integration.ClientAndServer;
+import org.openqa.selenium.chrome.ChromeOptions;
+
+import org.testcontainers.containers.BrowserWebDriverContainer;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Map;
 
+import static org.mockserver.integration.ClientAndServer.startClientAndServer;
+
 /**
  * @author tolga
  */
 public abstract class LocalStackTest {
 
-    protected static final int ASSERT_EVENTUALLY_TIMEOUT_SECS = 40;
+    protected static final int ASSERT_EVENTUALLY_TIMEOUT_SECS = 120;
+
+    protected static BrowserWebDriverContainer browserWebDriverContainer;
 
     protected String lambdaUrl;
+    protected ClientAndServer mockServerClient;
+
+    protected static String getHostAddress() {
+        String os = StringUtils.toLowerCase(System.getProperty("os.name"));
+        if (os.indexOf("nix") >= 0
+                || os.indexOf("nux") >= 0
+                || os.indexOf("aix") > 0) {
+            return "172.17.0.1";
+        } else {
+            return "host.docker.internal";
+        }
+    }
 
     @BeforeAll
-    static void beforeAll() throws Exception {
+    public static void beforeAll() throws Exception {
         LambdaServer.start();
+
+        browserWebDriverContainer =
+                new BrowserWebDriverContainer().
+                        withCapabilities(
+                                new ChromeOptions().
+                                        setHeadless(true).
+                                        addArguments("--disable-dev-shm-usage"));
+        browserWebDriverContainer.start();
     }
 
     @BeforeEach
-    void setup() throws Exception {
+    public void setup() throws Exception {
         LambdaServer.reset();
 
         executeCommand("make start-embedded");
@@ -47,16 +76,24 @@ public abstract class LocalStackTest {
         JSONArray array = object.getJSONArray("items");
         String restApiId = array.getJSONObject(0).getString("id");
         lambdaUrl = "http://localhost:4566/restapis/" + restApiId + "/local/_user_request_/requests";
+
+        mockServerClient = startClientAndServer(0);
     }
 
     @AfterEach
-    void teardown() throws IOException, InterruptedException {
+    public void teardown() throws IOException, InterruptedException {
         executeCommand("docker stop $(docker ps -a -q --filter ancestor=localstack/localstack --format=\"{{.ID}}\")");
+
+        if (mockServerClient != null) {
+            mockServerClient.stop();
+        }
     }
 
     @AfterAll
-    static void afterAll() throws Exception {
+    public static void afterAll() throws Exception {
         LambdaServer.stop();
+
+        browserWebDriverContainer.close();
     }
 
     private String executeCommand(String command) throws IOException, InterruptedException {

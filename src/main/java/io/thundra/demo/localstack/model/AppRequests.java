@@ -2,7 +2,6 @@ package io.thundra.demo.localstack.model;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBAttribute;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey;
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBRangeKey;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 
 /**
@@ -11,31 +10,20 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 @DynamoDBTable(tableName = "app-requests")// table name must be overridden on each call
 public class AppRequests {
 
-    private String id;
     private String requestId;
-    private String timestamp;
+    private long timestamp;
     private String status;
 
     public AppRequests() {
     }
 
-    public AppRequests(String id, String requestId, String timestamp, String status) {
-        this.id = id;
+    public AppRequests(String requestId, long timestamp, String status) {
         this.requestId = requestId;
         this.timestamp = timestamp;
         this.status = status;
     }
 
-    @DynamoDBHashKey(attributeName = "id")
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    @DynamoDBRangeKey(attributeName = "requestId")
+    @DynamoDBHashKey(attributeName = "requestId")
     public String getRequestId() {
         return requestId;
     }
@@ -45,11 +33,11 @@ public class AppRequests {
     }
 
     @DynamoDBAttribute(attributeName = "timestamp")
-    public String getTimestamp() {
+    public long getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(String timestamp) {
+    public void setTimestamp(long timestamp) {
         this.timestamp = timestamp;
     }
 
@@ -65,8 +53,7 @@ public class AppRequests {
     @Override
     public String toString() {
         return "AppRequests{" +
-                "id=" + id +
-                ", requestId='" + requestId + '\'' +
+                "requestId='" + requestId + '\'' +
                 ", timestamp='" + timestamp + '\'' +
                 ", status='" + status + '\'' +
                 '}';

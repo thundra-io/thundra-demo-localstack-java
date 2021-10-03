@@ -27,13 +27,16 @@ public class Processing implements RequestHandler<SQSEvent, Void> {
         records.forEach(sqsMessage -> {
             try {
                 String requestId = appRequestService.getRequestId(sqsMessage.getBody());
+
+                //simulate processing delay
+                Thread.sleep(TimeUnit.SECONDS.toMillis(4));
+
+                //set request status to PROCESSING
+                appRequestService.addAppRequest(requestId, "PROCESSING");
+
                 //simulate queueing delay
                 Thread.sleep(TimeUnit.SECONDS.toMillis(5));
                 appRequestService.sendAppRequestNotification(requestId);
-                //simulate processing delay
-                Thread.sleep(TimeUnit.SECONDS.toMillis(4));
-                //set request status to PROCESSING
-                appRequestService.addAppRequest(requestId, "PROCESSING");
             } catch (IOException | InterruptedException e) {
                 logger.error("Error occurred handling message. Exception is ", e);
             }

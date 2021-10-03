@@ -24,6 +24,7 @@ public class App implements RequestHandler<APIGatewayProxyRequestEvent, APIGatew
     private static final Logger logger = LogManager.getLogger(App.class);
     private static final Map<String, String> headers = new HashMap<String, String>() {{
         put("content-type", "application/json");
+        put("Access-Control-Allow-Credentials", "true");
     }};
 
     private final ObjectMapper mapper = new ObjectMapper();

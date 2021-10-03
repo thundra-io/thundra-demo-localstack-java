@@ -15,7 +15,6 @@ import io.thundra.demo.localstack.model.AppRequests;
 import io.thundra.demo.localstack.model.Message;
 
 import java.io.IOException;
-import java.util.Calendar;
 import java.util.List;
 
 import static io.thundra.demo.localstack.service.ClientBuilder.*;
@@ -76,8 +75,7 @@ public class AppRequestService {
     }
 
     public void addAppRequest(String requestId, String status) {
-        AppRequests item = new AppRequests(
-                generateShortUuid(), requestId, "" + Calendar.getInstance().getTime(), status);
+        AppRequests item = new AppRequests(requestId, System.currentTimeMillis(), status);
         dynamoDBMapper.save(item);
     }
 

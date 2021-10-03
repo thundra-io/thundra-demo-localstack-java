@@ -9,10 +9,10 @@ custom:
   region: ${opt:region, "us-east-1"}
   artifact: ${opt:artifact, "./target/thundra-demo-localstack.jar"}
   deploymentBucketName: ${self:service}-deployment-bucket-${self:custom.stage}
-  tableName: ${self:service}-app-requests-${self:custom.stage}
-  bucketName: ${self:service}-archive-bucket-${self:custom.stage}
-  queueName: ${self:service}-request-queue-${self:custom.stage}
-  topicName: ${self:service}-request-topic-${self:custom.stage}
+  tableName: ${self:service}-app-requests
+  bucketName: ${self:service}-archive-bucket
+  queueName: ${self:service}-request-queue
+  topicName: ${self:service}-request-topic
   localstack:
     stages:
       # list of stages for which the plugin should be enabled
@@ -72,15 +72,11 @@ resources:
       Properties:
         TableName: ${self:custom.tableName}
         AttributeDefinitions:
-          - AttributeName: id
-            AttributeType: S
           - AttributeName: requestId
             AttributeType: S
         KeySchema:
-          - AttributeName: id
-            KeyType: HASH
           - AttributeName: requestId
-            KeyType: RANGE
+            KeyType: HASH
     archiveBucket:
       Type: AWS::S3::Bucket
       Properties:
