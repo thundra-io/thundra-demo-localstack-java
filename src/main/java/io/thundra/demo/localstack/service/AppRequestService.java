@@ -11,7 +11,7 @@ import com.amazonaws.services.sqs.AmazonSQS;
 import com.amazonaws.services.sqs.model.SendMessageRequest;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.thundra.demo.localstack.model.AppRequests;
+import io.thundra.demo.localstack.model.AppRequest;
 import io.thundra.demo.localstack.model.Message;
 
 import java.io.IOException;
@@ -74,13 +74,26 @@ public class AppRequestService {
         sns.publish(publishRequest);
     }
 
-    public void addAppRequest(String requestId, String status) {
-        AppRequests item = new AppRequests(requestId, System.currentTimeMillis(), status);
-        dynamoDBMapper.save(item);
+    public void createAppRequest(String requestId, String status) {
+        AppRequest appRequest = new AppRequest(requestId, System.currentTimeMillis(), status);
+        dynamoDBMapper.save(appRequest);
     }
 
-    public List<AppRequests> listAppRequests() {
-        return dynamoDBMapper.scan(AppRequests.class, new DynamoDBScanExpression());
+    public void saveAppRequest(AppRequest appRequest) {
+        dynamoDBMapper.save(appRequest);
+    }
+
+    public void updateAppRequest(AppRequest appRequest) {
+        DynamoDBMapperConfig dynamoDBMapperConfig =
+                new DynamoDBMapperConfig.Builder().
+                        withConsistentReads(DynamoDBMapperConfig.ConsistentReads.CONSISTENT).
+                        withSaveBehavior(DynamoDBMapperConfig.SaveBehavior.UPDATE_SKIP_NULL_ATTRIBUTES).
+                    build();
+        dynamoDBMapper.save(appRequest, dynamoDBMapperConfig);
+    }
+
+    public List<AppRequest> listAppRequests() {
+        return dynamoDBMapper.scan(AppRequest.class, new DynamoDBScanExpression());
     }
 
     public void archiveAppRequest(String requestId) {

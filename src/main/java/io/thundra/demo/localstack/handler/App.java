@@ -6,7 +6,7 @@ import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.thundra.demo.localstack.model.AppRequests;
+import io.thundra.demo.localstack.model.AppRequest;
 import io.thundra.demo.localstack.model.Response;
 import io.thundra.demo.localstack.service.AppRequestService;
 import org.apache.log4j.LogManager;
@@ -51,12 +51,12 @@ public class App implements RequestHandler<APIGatewayProxyRequestEvent, APIGatew
     }
 
     private APIGatewayProxyResponseEvent startNewRequest() throws JsonProcessingException {
-        // put message onto SQS queue
+        // Put message onto SQS queue
         String requestId = appRequestService.generateRequestId();
         appRequestService.sendAppRequestMessage(requestId);
-        // set status in DynamoDB to QUEUED
+        // Set status in DynamoDB to "QUEUED"
         String status = "QUEUED";
-        appRequestService.addAppRequest(requestId, status);
+        appRequestService.createAppRequest(requestId, status);
         return new APIGatewayProxyResponseEvent().
                 withStatusCode(200).
                 withHeaders(headers).
@@ -64,7 +64,7 @@ public class App implements RequestHandler<APIGatewayProxyRequestEvent, APIGatew
     }
 
     private APIGatewayProxyResponseEvent listRequests() throws JsonProcessingException {
-        List<AppRequests> response = appRequestService.listAppRequests();
+        List<AppRequest> response = appRequestService.listAppRequests();
         return new APIGatewayProxyResponseEvent().
                 withStatusCode(200).
                 withHeaders(headers).

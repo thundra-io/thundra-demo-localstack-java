@@ -15,7 +15,7 @@
   <body>
     <div id="root"></div>
     <script type="text/babel">
-      const refreshInterval = 1000;
+      const refreshInterval = 5000;
       const apiEndpoint = 'localhost';
       const bucketName = 'thundra-demo-localstack-archive-bucket';
       const region = 'us-east-1';
@@ -72,7 +72,7 @@
           return (
             <div>
               <h2>Requests:</h2>
-              <div><input type="checkbox" checked={this.state.checked ? 'checked': null} onChange={this.changeAutoUpdate.bind(this)}/> Auto-Refresh</div>
+              <div><input id="chk-auto-refresh" type="checkbox" checked={this.state.checked ? 'checked': null} onChange={this.changeAutoUpdate.bind(this)}/> Auto-Refresh</div>
               <div><button id="btn-refresh" onClick={this.manualRefresh.bind(this)}>Refresh</button></div>
               <div><button id="btn-new-req" onClick={this.sendRequest.bind(this)}>Create new request</button></div>
               <table className="pure-table">

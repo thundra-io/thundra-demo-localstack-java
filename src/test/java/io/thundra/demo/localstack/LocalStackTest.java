@@ -36,6 +36,7 @@ import static org.mockserver.integration.ClientAndServer.startClientAndServer;
 public abstract class LocalStackTest {
 
     protected static final int ASSERT_EVENTUALLY_TIMEOUT_SECS = 120;
+    protected static final int ASSERT_EVENTUALLY_PERIOD_SECS = 10;
 
     protected static BrowserWebDriverContainer browserWebDriverContainer;
 
@@ -132,11 +133,15 @@ public abstract class LocalStackTest {
     }
 
     protected void assertEventually(Runnable assertTask) {
-        long deadline = System.currentTimeMillis() + (ASSERT_EVENTUALLY_TIMEOUT_SECS * 1000);
+        assertEventually(assertTask, ASSERT_EVENTUALLY_PERIOD_SECS, ASSERT_EVENTUALLY_TIMEOUT_SECS);
+    }
+
+    protected void assertEventually(Runnable assertTask, long periodSecs, long timeoutSecs) {
+        long deadline = System.currentTimeMillis() + (timeoutSecs * 1000);
         AssertionError assertionError = null;
         while (System.currentTimeMillis() < deadline) {
             try {
-                Thread.sleep(10 * 1000);
+                Thread.sleep(periodSecs * 1000);
             } catch (InterruptedException e) {
             }
             try {
