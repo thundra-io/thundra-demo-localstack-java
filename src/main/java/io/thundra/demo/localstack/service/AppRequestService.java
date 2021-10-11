@@ -92,6 +92,10 @@ public class AppRequestService {
         dynamoDBMapper.save(appRequest, dynamoDBMapperConfig);
     }
 
+    public AppRequest getAppRequest(String requestId) {
+        return dynamoDBMapper.load(AppRequest.class, requestId);
+    }
+
     public List<AppRequest> listAppRequests() {
         return dynamoDBMapper.scan(AppRequest.class, new DynamoDBScanExpression());
     }

@@ -35,9 +35,14 @@ public class App implements RequestHandler<APIGatewayProxyRequestEvent, APIGatew
         try {
             logger.info("Request --> " + request);
             if ("/requests".equals(request.getPath()) && "POST".equals(request.getHttpMethod())) {
-                return startNewRequest();
+                return startNewRequest(request);
             } else if ("/requests".equals(request.getPath()) && "GET".equals(request.getHttpMethod())) {
-                return listRequests();
+                String requestId = request.getQueryStringParameters().get("id");
+                if (requestId != null) {
+                    return getRequest(requestId);
+                } else {
+                    return listRequests();
+                }
             } else {
                 return new APIGatewayProxyResponseEvent().
                         withStatusCode(404);
@@ -50,9 +55,20 @@ public class App implements RequestHandler<APIGatewayProxyRequestEvent, APIGatew
         }
     }
 
-    private APIGatewayProxyResponseEvent startNewRequest() throws JsonProcessingException {
+    private String normalizeRequestId(String requestId) {
+        // Only allow letters, digits and -
+        requestId = requestId.replaceAll("[^a-zA-Z0-9\\-]", "");
+        return requestId;
+    }
+
+    private APIGatewayProxyResponseEvent startNewRequest(APIGatewayProxyRequestEvent request) throws JsonProcessingException {
+        String requestId = request.getQueryStringParameters().get("id");
+        if (requestId == null) {
+            requestId = appRequestService.generateRequestId();
+        } else {
+            requestId = normalizeRequestId(requestId);
+        }
         // Put message onto SQS queue
-        String requestId = appRequestService.generateRequestId();
         appRequestService.sendAppRequestMessage(requestId);
         // Set status in DynamoDB to "QUEUED"
         String status = "QUEUED";
@@ -61,6 +77,17 @@ public class App implements RequestHandler<APIGatewayProxyRequestEvent, APIGatew
                 withStatusCode(200).
                 withHeaders(headers).
                 withBody(mapper.writeValueAsString(new Response(requestId, status)));
+    }
+
+    private APIGatewayProxyResponseEvent getRequest(String requestId) throws JsonProcessingException {
+        // TODO There is a bug here.
+        // request id must be normalized here while getting as it is already normalized while saving
+        //requestId = normalizeRequestId(requestId);
+        AppRequest response = appRequestService.getAppRequest(requestId);
+        return new APIGatewayProxyResponseEvent().
+                withStatusCode(200).
+                withHeaders(headers).
+                withBody(mapper.writeValueAsString(response));
     }
 
     private APIGatewayProxyResponseEvent listRequests() throws JsonProcessingException {
