@@ -15,7 +15,6 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.logging.LogEntries;
 import org.openqa.selenium.logging.LogEntry;
 import org.openqa.selenium.logging.LogType;
-import org.openqa.selenium.remote.RemoteWebDriver;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -76,7 +75,7 @@ public class AppRequestLocalStackTest extends LocalStackTest {
         LambdaServer.registerFunctionEnvironmentInitializer(
                 ChaosInjector.createDynamoDBDelayInjector("backend_processRequest"));
 
-        String hostAddress = getHostAddress();
+        String hostAddress = BROWSERSTACK_ENABLE ? "localhost" : getHostAddress();
 
         String responseContent = IOUtils.toString(new FileInputStream("src/main/static/index.html"));
         responseContent = responseContent.replace("localhost", hostAddress);
@@ -88,8 +87,6 @@ public class AppRequestLocalStackTest extends LocalStackTest {
                 respond(response().
                         withStatusCode(200).
                         withBody(responseContent));
-
-        RemoteWebDriver webDriver = browserWebDriverContainer.getWebDriver();
 
         String url = "http://" + hostAddress + ":" + mockServerClient.getPort() + "/index.html";
         webDriver.get(url);
@@ -114,8 +111,7 @@ public class AppRequestLocalStackTest extends LocalStackTest {
             assertEventually(() -> {
                 try {
                     ResponseEntity<List<AppRequest>> getResponseEntity =
-                            get(lambdaUrl, new TypeReference<List<AppRequest>>() {
-                            });
+                            get(lambdaUrl, new TypeReference<List<AppRequest>>() {});
                     assertThat(getResponseEntity.getStatusCode()).isEqualTo(HttpStatus.SC_OK);
 
                     List<AppRequest> appRequests = getResponseEntity.getBody();

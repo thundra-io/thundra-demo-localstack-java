@@ -1,5 +1,6 @@
 package io.thundra.demo.localstack;
 
+import com.browserstack.local.Local;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -14,18 +15,23 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.json.JSONTokener;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.mockserver.integration.ClientAndServer;
 import org.openqa.selenium.chrome.ChromeOptions;
-
+import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.testcontainers.containers.BrowserWebDriverContainer;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import static org.mockserver.integration.ClientAndServer.startClientAndServer;
@@ -37,8 +43,12 @@ public abstract class LocalStackTest {
 
     protected static final int ASSERT_EVENTUALLY_TIMEOUT_SECS = 120;
     protected static final int ASSERT_EVENTUALLY_PERIOD_SECS = 10;
+    protected static final boolean BROWSERSTACK_ENABLE =
+            Boolean.parseBoolean(System.getenv("BROWSERSTACK_ENABLE"));
 
     protected static BrowserWebDriverContainer browserWebDriverContainer;
+    protected static RemoteWebDriver webDriver;
+    protected static Local local;
 
     protected String lambdaUrl;
     protected ClientAndServer mockServerClient;
@@ -58,13 +68,66 @@ public abstract class LocalStackTest {
     public static void beforeAll() throws Exception {
         LambdaServer.start();
 
-        browserWebDriverContainer =
-                new BrowserWebDriverContainer().
-                        withCapabilities(
-                                new ChromeOptions().
-                                        setHeadless(true).
-                                        addArguments("--disable-dev-shm-usage"));
-        browserWebDriverContainer.start();
+        if (BROWSERSTACK_ENABLE) {
+            webDriver = createBrowserStackWebDriver();
+        } else {
+            browserWebDriverContainer =
+                    new BrowserWebDriverContainer().
+                            withCapabilities(
+                                    new ChromeOptions().
+                                            setHeadless(true).
+                                            addArguments("--disable-dev-shm-usage"));
+            browserWebDriverContainer.start();
+            webDriver = browserWebDriverContainer.getWebDriver();
+        }
+    }
+
+    private static RemoteWebDriver createBrowserStackWebDriver() throws Exception {
+        Map<String, Object> config = new JSONObject(
+                new JSONTokener(
+                        ClassLoader.getSystemClassLoader().getResourceAsStream("conf/local.conf.json"))).
+                toMap();
+
+        DesiredCapabilities capabilities = new DesiredCapabilities();
+
+        Map<String, String> env = (Map<String, String>) config.get("environment");
+        Iterator it = env.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry pair = (Map.Entry) it.next();
+            capabilities.setCapability(pair.getKey().toString(), pair.getValue().toString());
+        }
+
+        Map<String, String> commonCapabilities = (Map<String, String>) config.get("capabilities");
+        it = commonCapabilities.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry pair = (Map.Entry) it.next();
+            if (capabilities.getCapability(pair.getKey().toString()) == null) {
+                capabilities.setCapability(pair.getKey().toString(), pair.getValue().toString());
+            }
+        }
+
+        String username = System.getenv("BROWSERSTACK_USERNAME");
+        if (username == null) {
+            username = (String) config.get("user");
+        }
+
+        String accessKey = System.getenv("BROWSERSTACK_ACCESS_KEY");
+        if (accessKey == null) {
+            accessKey = (String) config.get("key");
+        }
+
+        if (Boolean.parseBoolean(String.valueOf(capabilities.getCapability("browserstack.local")))) {
+            local = new Local();
+            Map<String, String> options = new HashMap();
+            options.put("key", accessKey);
+            local.start(options);
+        }
+
+        return new RemoteWebDriver(
+                new URL(
+                        "https://" + username + ":" + accessKey +
+                                "@" + config.get("server") + "/wd/hub"),
+                capabilities);
     }
 
     @BeforeEach
@@ -94,7 +157,20 @@ public abstract class LocalStackTest {
     public static void afterAll() throws Exception {
         LambdaServer.stop();
 
-        browserWebDriverContainer.close();
+        if (webDriver != null) {
+            webDriver.quit();
+            webDriver = null;
+        }
+
+        if (local != null) {
+            local.stop();
+            local = null;
+        }
+
+        if (browserWebDriverContainer != null) {
+            browserWebDriverContainer.close();
+            browserWebDriverContainer = null;
+        }
     }
 
     private String executeCommand(String command) throws IOException, InterruptedException {
