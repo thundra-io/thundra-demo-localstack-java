@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+    <script src="https://unpkg.com/react/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios@0.18.0/dist/axios.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/pure-min.css"></link>
+    <style type="text/css">
+      div {padding: 8px;}
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const refreshInterval = 5000;
+      const apiEndpoint = 'localhost';
+      const bucketName = 'thundra-demo-localstack-archive-bucket';
+      const region = 'us-east-1';
+
+      class App extends React.Component {
+
+        state = {}
+
+        getBaseURL() {
+          if (this.baseURL) {
+            return;
+          }
+          axios.get(`http://${apiEndpoint}:4566/restapis`,{
+            headers:{
+              Authorization: `AWS4-HMAC-SHA256 Credential=testkey/date/${region}/apigateway/aws4_request`,
+            }
+          }).then((res) => {
+            const apiID = res.data.item[0].id;
+            this.baseURL = `http://${apiEndpoint}:4566/restapis/${apiID}/local/_user_request_`;
+            this.setState(prevState=>({...prevState}));
+          });
+        }
+
+        sendRequest() {
+          if (!this.baseURL) {
+            return;
+          }
+          const url = this.baseURL + '/requests';
+          axios.post(url, '{}', {
+            withCredentials: true
+          }).then((res) => {
+            //alert('New request has been sent to the API. It should appear in the list as "QUEUED" shortly.');
+          });
+        }
+
+        componentDidMount() {
+          this.getBaseURL();
+          setInterval(this.autoRefresh.bind(this), refreshInterval);
+        }
+
+        autoRefresh() {
+          this.setState(prevState=>({...prevState}));
+        }
+
+        manualRefresh() {
+          this.setState({reload: true}, () => this.setState({reload: false}));
+        }
+
+        changeAutoUpdate() {
+          this.setState({autoUpdate: !this.state.autoUpdate})
+        }
+
+        render() {
+          return (
+            <div>
+              <h2>Requests:</h2>
+              <div><input id="chk-auto-refresh" type="checkbox" checked={this.state.checked ? 'checked': null} onChange={this.changeAutoUpdate.bind(this)}/> Auto-Refresh</div>
+              <div><button id="btn-refresh" onClick={this.manualRefresh.bind(this)}>Refresh</button></div>
+              <div><button id="btn-new-req" onClick={this.sendRequest.bind(this)}>Create new request</button></div>
+              <table className="pure-table">
+                <thead>
+                  <tr>
+                    <th>Timestamp</th><th>Request ID</th><th>Status</th><th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="events">
+                  <RequestEvents baseURL={this.baseURL} autoUpdate={this.state.autoUpdate} reload={this.state.reload}/>
+                </tbody>
+              </table>
+            </div>
+          );
+        }
+
+      }
+
+      class RequestEvents extends React.Component {
+
+        shouldFetchData() {
+          if (!this.props.baseURL) {
+            return false;
+          }
+          if (this.props.reload) {
+            return true;
+          }
+          if (this.nextUpdateTime) {
+            if (!this.props.autoUpdate) {
+              return false;
+            }
+            if (this.nextUpdateTime > Date.now()) {
+              return false;
+            }
+          }
+          this.nextUpdateTime = Date.now() + refreshInterval;
+          return true;
+        }
+
+        componentDidUpdate() {
+          if (!this.shouldFetchData()) {
+            return;
+          }
+          const url = this.props.baseURL + '/requests';
+          axios.get(url, {
+            withCredentials: true
+          }).then((res) => {
+            this.requests = res.data;
+            this.setState(prevState=>({...prevState}));
+          });
+        }
+
+        render() {
+          return (this.requests || []).
+              sort((r1, r2) => r2.timestamp - r1.timestamp).
+              map((r) => <Request req={r} key={r.requestId}/>);
+        }
+
+      }
+
+      class Request extends React.Component {
+        render() {
+          const { req } = this.props;
+          return (
+            <tr style={{backgroundColor:
+                      req.status === 'FINISHED'
+                              ? "#C0FF20"
+                              : (req.status === 'PROCESSING'
+                                  ? "#FFC000"
+                                  : "#80C0FF")}}>
+              <td>{new Date(req.timestamp).toLocaleString()}</td>
+              <td>{req.requestId}</td>
+              <td style={{width: "125px"}}>{req.status}</td>
+              <td style={{width: "250px"}}>
+              {req.status === 'FINISHED' &&
+                <a href={`http://${apiEndpoint}:4566/${bucketName}/${req.requestId}/result.txt`} target="_blank">
+                  Download result from S3</a>
+              }
+              </td>
+            </tr>
+          );
+        }
+      }
+
+      ReactDOM.render(React.createElement(App), document.getElementById('root'));
+    </script>
+  </body>
+</html>

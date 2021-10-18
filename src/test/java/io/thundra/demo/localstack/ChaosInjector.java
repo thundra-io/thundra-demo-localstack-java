@@ -6,6 +6,9 @@ import io.thundra.agent.lambda.localstack.domain.FunctionEnvironmentInfo;
 import io.thundra.agent.trace.TraceSupport;
 import io.thundra.agent.trace.span.impl.ErrorInjectorSpanListener;
 import io.thundra.agent.trace.span.impl.FilteringSpanListener;
+import io.thundra.agent.trace.span.impl.LatencyInjectorSpanListener;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author oguzhan
@@ -61,6 +64,19 @@ public final class ChaosInjector {
         };
     }
 
+    /*
+     * This must be defined in static context because initializer defined here
+     * is serialized into function sandbox environment.
+     */
+    public static FunctionEnvironmentInitializer createDynamoDBDelayInjector(String functionName) {
+        return new FunctionNameAwareEnvironmentInitializer(functionName) {
+            @Override
+            protected void doAfterInit(FunctionEnvironmentInfo functionEnvironmentInfo, Object context) {
+                ChaosInjector.injectDynamoDBLatency();
+            }
+        };
+    }
+
     public static void injectDynamoDBError() {
         ErrorInjectorSpanListener errorListener =
                 ErrorInjectorSpanListener.
@@ -77,6 +93,24 @@ public final class ChaosInjector {
                                     filterBuilder().
                                     className("AWS-DynamoDB").
                                     build()).
+                        build();
+        TraceSupport.registerSpanListener(errorFilteringSpanListener);
+    }
+
+    public static void injectDynamoDBLatency() {
+        LatencyInjectorSpanListener latencyListener =
+                LatencyInjectorSpanListener.
+                        builder().
+                        delay((int) TimeUnit.SECONDS.toMillis(20)).
+                        build();
+        FilteringSpanListener errorFilteringSpanListener =
+                FilteringSpanListener.
+                        builder().
+                        listener(latencyListener).
+                        filter(FilteringSpanListener.
+                                filterBuilder().
+                                className("AWS-DynamoDB").
+                                build()).
                         build();
         TraceSupport.registerSpanListener(errorFilteringSpanListener);
     }

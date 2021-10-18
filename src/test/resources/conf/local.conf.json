@@ -1,0 +1,17 @@
+{
+  "server": "hub-cloud.browserstack.com",
+  "user": "<YOUR-BROWSERSTACK-USER-NAME>",
+  "key": "<YOUR-BROWSERSTACK-ACCESS-KEY>",
+
+  "capabilities": {
+    "build": "thundra-demo-localstack-build",
+    "name": "thundra-demo-localstack",
+    "browserstack.debug": true,
+    "browserstack.local": true,
+    "browserstack.networkLogs": true
+  },
+
+  "environment": {
+    "browser": "chrome"
+  }
+}
