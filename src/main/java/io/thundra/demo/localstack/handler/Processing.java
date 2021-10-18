@@ -37,13 +37,13 @@ public class Processing implements RequestHandler<SQSEvent, Void> {
                 // Simulate some more processing delay
                 Thread.sleep(TimeUnit.SECONDS.toMillis(5));
 
-                // Set request status to "PROCESSING"
+                // Set request status to "PROCESSED"
                 appRequestService.updateAppRequest(
                         // Fill only updated attributes
                         new AppRequest().
                                 setRequestId(requestId).
                                 setProcessedTimestamp(System.currentTimeMillis()).
-                                setStatus("PROCESSING"));
+                                setStatus("PROCESSED"));
             } catch (IOException | InterruptedException e) {
                 logger.error("Error occurred handling message. Exception is ", e);
             }
