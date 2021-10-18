@@ -11,36 +11,40 @@ export THUNDRA_AGENT_TEST_SPAN_COUNT_MAX = 200
 export THUNDRA_AGENT_TRACE_INSTRUMENT_TRACEABLECONFIG = io.thundra.demo.localstack.*.*[traceLineByLine=true]
 export THUNDRA_AGENT_TRACE_INSTRUMENT_METHOD_LINE_COUNT_MAX = 200
 
-usage:              ## Show this help
+usage:                  ## Show this help
 	@fgrep -h "##" $(MAKEFILE_LIST) | fgrep -v fgrep | sed -e 's/\\$$//' | sed -e 's/##//'
 
-install:            ## Install dependencies
+install:                ## Install dependencies
 	npm install
 	which serverless || npm install -g serverless
 	which localstack || pip install localstack
 	which awslocal   || pip install awscli-local
 
-build:              ## Build app
+build:                  ## Build app
 	echo "Building Serverless app ..."
 	mvn clean package -DskipTests
 
-test:               ## Test app
+test:                   ## Test app
 	echo "Building Serverless app ..."
 	mvn clean test
 
-deploy:             ## Deploy the app locally
+deploy:                 ## Deploy the app locally
 	echo "Deploying Serverless app to local environment ..."
 	SLS_DEBUG=1 serverless deploy --stage local --region ${AWS_DEFAULT_REGION}
 
-start:              ## Build, deploy and start the app locally
+start:                  ## Build, deploy and start the app locally
 	@make build;
 	@make deploy;
 
-deploy-forwarded:   ## Deploy the app locally in forwarded mode
+deploy-forwarded:       ## Deploy the app locally in forwarded mode
 	echo "Deploying Serverless app to local environment ..."
 	LAMBDA_FORWARD_URL=http://${DOCKER_BRIDGE}:8080 SLS_DEBUG=1 serverless deploy --stage local --region ${AWS_DEFAULT_REGION} --artifact null.zip
 
-start-embedded:     ## Deploy and start the app embedded in forwarded mode from Localstack
+start-embedded:         ## Deploy and start the app embedded in forwarded mode from Localstack
 	@make deploy-forwarded;
+
+start-lambda-executor:  ## Start Thundra local Lambda executor
+	echo "Starting Thundra local Lambda executor ..."
+	mvn clean compile exec:java -Dexec.mainClass="io.thundra.agent.lambda.localstack.LambdaServer" -Dexec.classpathScope="test" -Dexec.addResourcesToClasspath=true
 
 .PHONY: usage install build test deploy start
