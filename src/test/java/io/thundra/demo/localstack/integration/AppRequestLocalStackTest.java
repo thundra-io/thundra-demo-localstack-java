@@ -66,7 +66,7 @@ public class AppRequestLocalStackTest extends LocalStackTest {
             } catch (IOException e) {
                 throw new AssertionError(e);
             }
-        });
+        }, ASSERT_EVENTUALLY_PERIOD_SECS, 60);
     }
 
     @Test
