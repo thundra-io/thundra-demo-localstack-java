@@ -40,6 +40,8 @@ provider:
       Ref: requestTopic
     ARCHIVE_BUCKET_NAME: ${self:custom.bucketName}
     THUNDRA_APIKEY: ${env:THUNDRA_APIKEY}
+    THUNDRA_AGENT_LAMBDA_REPORT_REST_BASEURL: ${env:THUNDRA_AGENT_REPORT_REST_BASEURL:"https://collector.thundra.io/v1"}
+    THUNDRA_AGENT_TRACE_INSTRUMENT_TRACEABLECONFIG: io.thundra.demo.localstack.*.*[traceLineByLine=true,methodModifiers=0x00000001|0x00000002]
 
 functions:
   http_handleRequest:
