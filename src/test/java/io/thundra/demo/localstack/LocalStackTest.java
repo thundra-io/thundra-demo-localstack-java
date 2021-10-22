@@ -188,6 +188,9 @@ public abstract class LocalStackTest {
             builder.command("sh", "-c", command);
         }
 
+        builder.redirectOutput(ProcessBuilder.Redirect.INHERIT);
+        builder.redirectError(ProcessBuilder.Redirect.INHERIT);
+
         Map<String, String> processEnvVars = builder.environment();
         if (envVars != null) {
             for (Map.Entry<String, String> e : envVars.entrySet()) {
